@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>장난감 거짓말 탐지기</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>거짓말 탐지기</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="machine">
+    <div id="result">손을 올리세요</div>
 
-<div class="detector">
-  <!-- 손 올리는 손 모양 -->
-  <div class="hand" id="hand">
-    <div class="finger"></div>
-    <div class="finger"></div>
-    <div class="finger"></div>
-    <div class="finger"></div>
+    <div id="led-ring">
+      <div class="led"></div>
+      <div class="led"></div>
+      <div class="led"></div>
+      <div class="led"></div>
+      <div class="led"></div>
+      <div class="led"></div>
+    </div>
+
+    <!-- 손 패드 -->
+    <div id="hand-pad">
+      ✋
+    </div>
   </div>
 
-  <!-- 결과 -->
-  <div class="result" id="result">손을 올리세요</div>
-</div>
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
