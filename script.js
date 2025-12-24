@@ -1,53 +1,78 @@
-const hand = document.getElementById("hand");
+const handPad = document.getElementById("hand-pad");
 const result = document.getElementById("result");
+const leds = document.querySelectorAll(".led");
 
 let running = false;
 
-// 소리 생성 (파일 필요 없음)
-function playBeep(freq, duration) {
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
+// 🔊 빰빠빠빰 소리 생성
+function playSound() {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  let t = ctx.currentTime;
 
-  osc.frequency.value = freq;
-  osc.type = "square";
+  [440, 554, 659].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
 
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
+    osc.frequency.value = freq;
+    osc.type = "square";
+    gain.gain.value = 0.2;
 
-  osc.start();
-  setTimeout(() => {
-    osc.stop();
-  }, duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(t + i * 0.25);
+    osc.stop(t + i * 0.25 + 0.2);
+  });
 }
 
-hand.addEventListener("click", () => {
+// 💡 LED 회전 효과
+function spinLeds() {
+  let index = 0;
+  const interval = setInterval(() => {
+    leds.forEach(l => l.style.background = "#333");
+    leds[index].style.background = "red";
+    index = (index + 1) % leds.length;
+  }, 150);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    leds.forEach(l => l.style.background = "#333");
+  }, 2000);
+}
+
+// 📳 진동
+function vibrateStrong() {
+  if (navigator.vibrate) {
+    navigator.vibrate([400, 100, 400]);
+  }
+}
+
+// ▶ 실행
+handPad.addEventListener("touchstart", start);
+handPad.addEventListener("mousedown", start);
+
+function start() {
   if (running) return;
   running = true;
 
   result.textContent = "분석 중...";
-  
-  // 빰빠빠빰 느낌
-  playBeep(400, 200);
-  setTimeout(() => playBeep(600, 200), 250);
-  setTimeout(() => playBeep(800, 200), 500);
+  playSound();
+  spinLeds();
 
   setTimeout(() => {
-    const isTruth = Math.random() < 0.5;
+    const truth = Math.random() < 0.5;
 
-    if (isTruth) {
-      result.textContent = "진실 ✅";
-      playBeep(1000, 500);
+    if (truth) {
+      result.textContent = "✅ 진실";
     } else {
-      result.textContent = "거짓 ❌";
-      playBeep(200, 600);
-
-      // 안드로이드 진동
-      if (navigator.vibrate) {
-        navigator.vibrate([300, 100, 300, 100, 300]);
-      }
+      result.textContent = "❌ 거짓";
+      vibrateStrong();
     }
 
-    running = false;
-  }, 1200);
-});
+    setTimeout(() => {
+      result.textContent = "손을 올리세요";
+      running = false;
+    }, 2000);
+
+  }, 2000);
+}
