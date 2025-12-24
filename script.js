@@ -1,77 +1,56 @@
-const handArea = document.getElementById("handArea");
-const dotsContainer = document.getElementById("dots");
+const machine = document.getElementById("machine");
+const lights = document.querySelectorAll(".light");
+const result = document.getElementById("result");
 
 let running = false;
 
-// Web Audio (소리 생성)
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioCtx();
-
-function beep(freq, time) {
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.frequency.value = freq;
+// 🔊 소리 생성 (파일 필요 없음)
+function playSound() {
+  const ctx = new AudioContext();
+  const osc = ctx.createOscillator();
   osc.type = "square";
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
+  osc.frequency.setValueAtTime(600, ctx.currentTime);
+  osc.connect(ctx.destination);
   osc.start();
-  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + time);
-  osc.stop(audioCtx.currentTime + time);
+  osc.stop(ctx.currentTime + 0.15);
 }
 
-function playBampabam() {
-  beep(400, 0.2);
-  setTimeout(() => beep(500, 0.2), 250);
-  setTimeout(() => beep(600, 0.3), 500);
-}
-
-// 점 애니메이션
-function animateDots() {
-  dotsContainer.innerHTML = "";
-  for (let i = 0; i < 7; i++) {
-    const d = document.createElement("div");
-    d.className = "dot";
-    dotsContainer.appendChild(d);
+// 📳 진동
+function vibrate(strength = 200) {
+  if (navigator.vibrate) {
+    navigator.vibrate(strength);
   }
-
-  const dots = document.querySelectorAll(".dot");
-  let i = 0;
-  const interval = setInterval(() => {
-    dots.forEach(dot => dot.style.background = "gray");
-    dots[i].style.background = "yellow";
-    i++;
-    if (i >= dots.length) i = 0;
-  }, 150);
-
-  return interval;
 }
 
-// 시작
-function startTest() {
+// 🎰 시작
+machine.addEventListener("click", () => {
   if (running) return;
   running = true;
-  handArea.textContent = "측정 중...";
+  result.textContent = "SCANNING...";
 
-  audioCtx.resume();
-  playBampabam();
+  let index = 0;
+  const interval = setInterval(() => {
+    lights.forEach(l => l.style.background = "#333");
+    lights[index % lights.length].style.background = "yellow";
 
-  const anim = animateDots();
+    playSound();
+    index++;
 
-  setTimeout(() => {
-    clearInterval(anim);
-    dotsContainer.innerHTML = "";
-
-    const isTruth = Math.random() < 0.5;
-
-    handArea.textContent = isTruth ? "진실입니다 ✅" : "거짓입니다 ❌";
-
-    if (!isTruth && navigator.vibrate) {
-      navigator.vibrate([300, 100, 300, 100, 500]);
+    if (index > 12) {
+      clearInterval(interval);
+      finish();
     }
+  }, 200);
+});
 
-    running = false;
-  }, 3000);
+// 🎯 결과
+function finish() {
+  const truth = Math.random() < 0.5;
+
+  lights.forEach(l => l.style.background = truth ? "green" : "red");
+  result.textContent = truth ? "TRUTH" : "LIE";
+
+  if (!truth) vibrate([200, 100, 200, 100, 400]);
+
+  running = false;
 }
-
-handArea.addEventListener("click", startTest);
-handArea.addEventListener("touchstart", startTest);
