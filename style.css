@@ -1,0 +1,43 @@
+body {
+  background: #1e1e1e;
+  color: white;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.detector {
+  background: #f2f2f2;
+  color: black;
+  padding: 30px;
+  border-radius: 20px;
+  width: 300px;
+  text-align: center;
+}
+
+.lights span {
+  display: inline-block;
+  width: 100px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  background: #ccc;
+}
+
+.active-truth {
+  background: green;
+  color: white;
+}
+
+.active-lie {
+  background: red;
+  color: white;
+}
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+}
