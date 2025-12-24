@@ -1,75 +1,63 @@
-* {
+html, body {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-body {
   background: #111;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   touch-action: none;
-  font-family: sans-serif;
 }
 
 #machine {
-  width: 90vmin;
-  height: 90vmin;
-  background: #444;
-  border-radius: 50%;
-  position: relative;
-  box-shadow: inset 0 0 30px #000;
-}
-
-/* 결과 표시 */
-#result {
-  position: absolute;
-  top: 8%;
-  width: 100%;
-  text-align: center;
-  color: #0f0;
-  font-size: 6vmin;
-  font-weight: bold;
-}
-
-/* LED */
-#leds {
-  position: absolute;
-  top: 25%;
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(#333, #000);
   display: flex;
-  justify-content: center;
-  gap: 2vmin;
-}
-
-.led {
-  width: 4vmin;
-  height: 4vmin;
-  background: #222;
-  border-radius: 50%;
-}
-
-/* 손 패드 */
-#hand-pad {
-  position: absolute;
-  bottom: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 40%;
-  background: #222;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
-/* 손 모양 */
-#hand-shape {
-  width: 60%;
-  height: 70%;
-  border-radius: 40% 40% 50% 50%;
-  border: 4px solid #666;
+#result {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+#leds {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+#leds span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #222;
+}
+
+#leds.active span {
+  animation: blink 0.4s infinite alternate;
+}
+
+@keyframes blink {
+  from { background: red; }
+  to { background: yellow; }
+}
+
+#hand-area {
+  width: 260px;
+  height: 180px;
+  background: #222;
+  border-radius: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 20px #000;
+}
+
+#hand {
+  font-size: 5rem;
+  opacity: 0.8;
 }
