@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>거짓말 탐지기</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,15 +11,25 @@
 <div id="machine">
   <div id="result">손을 올려주세요</div>
 
+  <!-- LED -->
   <div id="leds">
-    <span></span><span></span><span></span><span></span><span></span>
+    <div class="led"></div>
+    <div class="led"></div>
+    <div class="led"></div>
+    <div class="led"></div>
+    <div class="led"></div>
   </div>
 
   <!-- 손 올리는 패드 -->
-  <div id="hand-area">
-    <div id="hand">✋</div>
+  <div id="hand-pad">
+    <div id="hand-shape"></div>
   </div>
 </div>
+
+<!-- 소리 -->
+<audio id="scan-sound" src="scan.mp3" preload="auto"></audio>
+<audio id="truth-sound" src="truth.mp3" preload="auto"></audio>
+<audio id="lie-sound" src="lie.mp3" preload="auto"></audio>
 
 <script src="script.js"></script>
 </body>
