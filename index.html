@@ -2,30 +2,32 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>거짓말 탐지기</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="machine" id="machine">
-  <div class="strap"></div>
+<div id="app">
+  <div id="machine">
+    <div id="hand-area">손 올리기</div>
 
-  <div class="metal-fingers">
-    <div class="finger"></div>
-    <div class="finger"></div>
-    <div class="finger"></div>
-    <div class="finger"></div>
-  </div>
+    <div id="fingers">
+      <div class="finger"></div>
+      <div class="finger"></div>
+      <div class="finger"></div>
+      <div class="finger"></div>
+    </div>
 
-  <div class="indicator">
-    <span class="lie">LIE</span>
-    <div class="dots" id="dots"></div>
-    <span class="truth">TRUTH</span>
-  </div>
+    <div id="lights">
+      <span class="light"></span>
+      <span class="light"></span>
+      <span class="light"></span>
+      <span class="light"></span>
+      <span class="light"></span>
+    </div>
 
-  <div class="hand-area" id="handArea">
-    손을 올려주세요
+    <div id="result">READY</div>
   </div>
 </div>
 
