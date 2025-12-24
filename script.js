@@ -1,73 +1,66 @@
-const handPad = document.getElementById("hand-pad");
-const resultText = document.getElementById("result");
-const screen = document.getElementById("screen");
-
 let running = false;
 
-/* ===== 소리 생성 ===== */
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioCtx = new AudioContext();
+const screen = document.getElementById("screen");
+const handArea = document.getElementById("hand-area");
 
-function beep(freq, duration) {
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioCtx();
+
+// 분석 중 소리 (빰빠빠빰)
+function analysisSound() {
+  let time = audioCtx.currentTime;
+  for (let i = 0; i < 6; i++) {
+    const osc = audioCtx.createOscillator();
+    osc.frequency.value = 400 + i * 80;
+    osc.connect(audioCtx.destination);
+    osc.start(time + i * 0.25);
+    osc.stop(time + i * 0.25 + 0.15);
+  }
+}
+
+// 결과 소리
+function resultSound(isLie) {
   const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.frequency.value = freq;
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
+  osc.frequency.value = isLie ? 120 : 800;
+  osc.connect(audioCtx.destination);
   osc.start();
-  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(
-    0.001,
-    audioCtx.currentTime + duration
-  );
-  osc.stop(audioCtx.currentTime + duration);
+  osc.stop(audioCtx.currentTime + 0.6);
 }
 
-/* 빰빠빠빰 */
-function startSound() {
-  beep(400, 0.15);
-  setTimeout(() => beep(500, 0.15), 200);
-  setTimeout(() => beep(600, 0.3), 400);
-}
+// 손 올리면 시작 (터치 인식)
+handArea.addEventListener("touchstart", startDetector);
+handArea.addEventListener("mousedown", startDetector);
 
-/* ===== 실행 ===== */
 function startDetector() {
   if (running) return;
   running = true;
 
-  resultText.textContent = "분석 중...";
-  screen.classList.add("scanning");
-  startSound();
+  screen.textContent = "분석 중...";
+  screen.style.color = "#ff0";
+  analysisSound();
 
   setTimeout(() => {
-    const isTruth = Math.random() < 0.5;
+    const isLie = Math.random() < 0.5;
 
-    screen.classList.remove("scanning");
+    if (isLie) {
+      screen.textContent = "거짓";
+      screen.style.color = "red";
+      resultSound(true);
 
-    if (isTruth) {
-      resultText.textContent = "✅ 진실";
-      beep(800, 0.4);
-    } else {
-      resultText.textContent = "❌ 거짓";
-      beep(200, 0.6);
-
-      // 🔥 강한 진동 (안드로이드)
       if (navigator.vibrate) {
-        navigator.vibrate([300, 100, 300, 100, 500]);
+        navigator.vibrate([300, 100, 300, 100, 300]);
       }
+    } else {
+      screen.textContent = "진실";
+      screen.style.color = "#0f0";
+      resultSound(false);
     }
 
     setTimeout(() => {
-      resultText.textContent = "손을 올려주세요";
+      screen.textContent = "손을 올리세요";
+      screen.style.color = "#0f0";
       running = false;
     }, 2000);
-  }, 2000);
-}
 
-/* ===== 손 올리면 자동 시작 ===== */
-handPad.addEventListener("touchstart", () => {
-  audioCtx.resume(); // 모바일 사운드 허용
-  startDetector();
-});
+  }, 3000); // 분석 시간 3초
+}
