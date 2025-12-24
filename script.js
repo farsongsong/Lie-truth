@@ -1,56 +1,61 @@
-const machine = document.getElementById("machine");
+const handArea = document.getElementById("handArea");
 const lights = document.querySelectorAll(".light");
 const result = document.getElementById("result");
 
-let running = false;
+let audioCtx;
 
-// 🔊 소리 생성 (파일 필요 없음)
-function playSound() {
-  const ctx = new AudioContext();
-  const osc = ctx.createOscillator();
-  osc.type = "square";
-  osc.frequency.setValueAtTime(600, ctx.currentTime);
-  osc.connect(ctx.destination);
-  osc.start();
-  osc.stop(ctx.currentTime + 0.15);
-}
-
-// 📳 진동
-function vibrate(strength = 200) {
-  if (navigator.vibrate) {
-    navigator.vibrate(strength);
+function playBeep(freq, time) {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }
+
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = "square";
+  osc.frequency.value = freq;
+  gain.gain.value = 0.1;
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + time);
 }
 
-// 🎰 시작
-machine.addEventListener("click", () => {
-  if (running) return;
-  running = true;
+function startScan() {
   result.textContent = "SCANNING...";
-
   let index = 0;
+
   const interval = setInterval(() => {
-    lights.forEach(l => l.style.background = "#333");
-    lights[index % lights.length].style.background = "yellow";
+    lights.forEach(l => l.classList.remove("active"));
+    lights[index % lights.length].classList.add("active");
 
-    playSound();
+    playBeep(600 + index * 40, 0.1);
     index++;
-
-    if (index > 12) {
-      clearInterval(interval);
-      finish();
-    }
   }, 200);
-});
 
-// 🎯 결과
-function finish() {
-  const truth = Math.random() < 0.5;
+  setTimeout(() => {
+    clearInterval(interval);
+    lights.forEach(l => l.classList.remove("active"));
 
-  lights.forEach(l => l.style.background = truth ? "green" : "red");
-  result.textContent = truth ? "TRUTH" : "LIE";
+    const isTruth = Math.random() < 0.5;
 
-  if (!truth) vibrate([200, 100, 200, 100, 400]);
+    if (isTruth) {
+      result.textContent = "TRUTH";
+      result.style.color = "green";
+      playBeep(400, 0.4);
+    } else {
+      result.textContent = "LIE";
+      result.style.color = "red";
+      playBeep(120, 0.6);
 
-  running = false;
+      if (navigator.vibrate) {
+        navigator.vibrate([300, 100, 300, 100, 500]);
+      }
+    }
+  }, 3000);
 }
+
+handArea.addEventListener("touchstart", startScan);
+handArea.addEventListener("mousedown", startScan);
