@@ -1,78 +1,73 @@
 const handPad = document.getElementById("hand-pad");
-const result = document.getElementById("result");
-const leds = document.querySelectorAll(".led");
+const resultText = document.getElementById("result");
+const screen = document.getElementById("screen");
 
 let running = false;
 
-// 🔊 빰빠빠빰 소리 생성
-function playSound() {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  let t = ctx.currentTime;
+/* ===== 소리 생성 ===== */
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContext();
 
-  [440, 554, 659].forEach((freq, i) => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+function beep(freq, duration) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
 
-    osc.frequency.value = freq;
-    osc.type = "square";
-    gain.gain.value = 0.2;
+  osc.frequency.value = freq;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(t + i * 0.25);
-    osc.stop(t + i * 0.25 + 0.2);
-  });
+  osc.start();
+  gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(
+    0.001,
+    audioCtx.currentTime + duration
+  );
+  osc.stop(audioCtx.currentTime + duration);
 }
 
-// 💡 LED 회전 효과
-function spinLeds() {
-  let index = 0;
-  const interval = setInterval(() => {
-    leds.forEach(l => l.style.background = "#333");
-    leds[index].style.background = "red";
-    index = (index + 1) % leds.length;
-  }, 150);
-
-  setTimeout(() => {
-    clearInterval(interval);
-    leds.forEach(l => l.style.background = "#333");
-  }, 2000);
+/* 빰빠빠빰 */
+function startSound() {
+  beep(400, 0.15);
+  setTimeout(() => beep(500, 0.15), 200);
+  setTimeout(() => beep(600, 0.3), 400);
 }
 
-// 📳 진동
-function vibrateStrong() {
-  if (navigator.vibrate) {
-    navigator.vibrate([400, 100, 400]);
-  }
-}
-
-// ▶ 실행
-handPad.addEventListener("touchstart", start);
-handPad.addEventListener("mousedown", start);
-
-function start() {
+/* ===== 실행 ===== */
+function startDetector() {
   if (running) return;
   running = true;
 
-  result.textContent = "분석 중...";
-  playSound();
-  spinLeds();
+  resultText.textContent = "분석 중...";
+  screen.classList.add("scanning");
+  startSound();
 
   setTimeout(() => {
-    const truth = Math.random() < 0.5;
+    const isTruth = Math.random() < 0.5;
 
-    if (truth) {
-      result.textContent = "✅ 진실";
+    screen.classList.remove("scanning");
+
+    if (isTruth) {
+      resultText.textContent = "✅ 진실";
+      beep(800, 0.4);
     } else {
-      result.textContent = "❌ 거짓";
-      vibrateStrong();
+      resultText.textContent = "❌ 거짓";
+      beep(200, 0.6);
+
+      // 🔥 강한 진동 (안드로이드)
+      if (navigator.vibrate) {
+        navigator.vibrate([300, 100, 300, 100, 500]);
+      }
     }
 
     setTimeout(() => {
-      result.textContent = "손을 올리세요";
+      resultText.textContent = "손을 올려주세요";
       running = false;
     }, 2000);
-
   }, 2000);
 }
+
+/* ===== 손 올리면 자동 시작 ===== */
+handPad.addEventListener("touchstart", () => {
+  audioCtx.resume(); // 모바일 사운드 허용
+  startDetector();
+});
