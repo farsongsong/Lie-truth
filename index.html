@@ -1,185 +1,34 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-<title>장난감 거짓말 탐지기</title>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  touch-action: manipulation;
-}
-
-body {
-  background: #111;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-}
-
-#app {
-  width: 100%;
-  height: 100%;
-  background: #2c2c2c;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 장난감 본체 */
-.machine {
-  width: 320px;
-  height: 420px;
-  background: linear-gradient(#d22, #a00);
-  border-radius: 30px;
-  padding: 20px;
-  box-shadow: inset 0 -10px 0 rgba(0,0,0,0.3);
-}
-
-/* LED */
-.leds {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.led {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #333;
-  box-shadow: inset 0 0 5px black;
-}
-
-/* 패드 */
-.pad {
-  width: 100%;
-  height: 160px;
-  background: #111;
-  border-radius: 20px;
-  margin: 20px 0;
-  box-shadow: inset 0 0 20px black;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #aaa;
-  font-size: 18px;
-  text-align: center;
-}
-
-/* 결과 */
-.result {
-  font-size: 32px;
-  font-weight: bold;
-  margin-top: 10px;
-  color: white;
-}
-
-/* 애니메이션 */
-.blink {
-  animation: blink 0.2s infinite;
-}
-
-@keyframes blink {
-  0% { opacity: 1 }
-  50% { opacity: 0.2 }
-  100% { opacity: 1 }
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>거짓말 탐지기</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-<div id="app">
-  <div class="machine">
-    <div class="leds">
-      <div class="led"></div>
-      <div class="led"></div>
-      <div class="led"></div>
-      <div class="led"></div>
-    </div>
 
-    <div class="pad" id="pad">
-      손을 올리세요
-    </div>
+<div class="machine" id="machine">
+  <div class="strap"></div>
 
-    <div class="result" id="result"></div>
+  <div class="metal-fingers">
+    <div class="finger"></div>
+    <div class="finger"></div>
+    <div class="finger"></div>
+    <div class="finger"></div>
+  </div>
+
+  <div class="indicator">
+    <span class="lie">LIE</span>
+    <div class="dots" id="dots"></div>
+    <span class="truth">TRUTH</span>
+  </div>
+
+  <div class="hand-area" id="handArea">
+    손을 올려주세요
   </div>
 </div>
 
-<script>
-const pad = document.getElementById("pad");
-const leds = document.querySelectorAll(".led");
-const result = document.getElementById("result");
-
-let running = false;
-
-/* 🔊 빰빠빠빰 소리 생성 (파일 필요 없음) */
-function playSound() {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  let t = ctx.currentTime;
-
-  [440, 660, 880, 660].forEach(freq => {
-    const osc = ctx.createOscillator();
-    osc.type = "square";
-    osc.frequency.value = freq;
-    osc.connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.15);
-    t += 0.18;
-  });
-}
-
-/* 📳 진동 */
-function vibrateStrong() {
-  if (navigator.vibrate) {
-    navigator.vibrate([300, 100, 300, 100, 500]);
-  }
-}
-
-/* LED 회전 */
-function startLeds() {
-  let i = 0;
-  return setInterval(() => {
-    leds.forEach(l => l.style.background = "#333");
-    leds[i % leds.length].style.background = "yellow";
-    i++;
-  }, 100);
-}
-
-/* 시작 */
-pad.addEventListener("touchstart", () => {
-  if (running) return;
-  running = true;
-
-  pad.textContent = "측정 중...";
-  result.textContent = "";
-
-  playSound();
-  const ledTimer = startLeds();
-
-  setTimeout(() => {
-    clearInterval(ledTimer);
-
-    const isLie = Math.random() < 0.5;
-
-    leds.forEach(l => l.style.background = isLie ? "red" : "lime");
-
-    if (isLie) {
-      result.textContent = "거짓말!";
-      vibrateStrong();
-    } else {
-      result.textContent = "진실!";
-    }
-
-    pad.textContent = "다시 손 올리기";
-    running = false;
-  }, 2500);
-});
-</script>
+<script src="script.js"></script>
 </body>
 </html>
